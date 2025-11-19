@@ -64,13 +64,13 @@ function perbaruiTampilan() {
         const sign = item.nilai > 0 ? '+' : '';
         const cssClass = item.nilai > 0 ? 'income' : 'expense';
 
-        li.innerHTML = `${item.tanggal}: <span class="${cssClass}">${sign}${item.nilai.toLocaleString('id-ID')}</span> (${item.tipe})`;
+        li.innerHTML = `${item.tanggal}: <span class="${cssClass}">${sign}Rp ${Math.abs(item.nilai).toLocaleString('id-ID')}</span>`;
         riwayatElement.appendChild(li);
     });
 }
 
 function hapusSemuaData() {
-    if (confirm("Apakah Anda yakin ingin menghapus semua data? ")) {
+    if (confirm("Apakah Anda yakin ingin menghapus semua data?")) {
         localStorage.removeItem('dataKeuangan');
         saldo = 0;
         transaksi = [];
