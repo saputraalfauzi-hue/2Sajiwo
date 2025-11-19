@@ -1,1 +1,158 @@
-<h1>Helo World</h1>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Keuangan Sederhana</title>
+</head>
+<body>
+    <h1>Hitung Pemasukan dan Pengeluaran</h1>
+
+    <form id="transaksi-form">
+        <label for="deskripsi">Deskripsi:</label>
+        <input type="text" id="deskripsi" required><br><br>
+
+        <label for="jumlah">Jumlah (Rp):</label>
+        <input type="number" id="jumlah" required min="1"><br><br>
+
+        <label for="jenis">Jenis:</label>
+        <select id="jenis">
+            <option value="pemasukan">Pemasukan (+)</option>
+            <option value="pengeluaran">Pengeluaran (-)</option>
+        </select><br><br>
+
+        <button type="submit">Tambah Transaksi</button>
+    </form>
+
+    <hr>
+
+    <h2>Ringkasan Keuangan</h2>
+    <p>Total Pemasukan: <span id="total-pemasukan">Rp 0</span></p>
+    <p>Total Pengeluaran: <span id="total-pengeluaran">Rp 0</span></p>
+    <h3>Saldo Akhir: <span id="saldo-akhir">Rp 0</span></h3>
+
+    <hr>
+
+    <h2>Riwayat Transaksi</h2>
+    <ul id="riwayat-list">
+        </ul>
+    
+    <button onclick="hapusSemuaData()">Hapus Semua Data</button>
+
+    <script>
+        // --- Bagian JavaScript untuk Logika Aplikasi ---
+
+        // 1. Variabel Global dan Ambil Elemen HTML
+        const transaksiForm = document.getElementById('transaksi-form');
+        const riwayatList = document.getElementById('riwayat-list');
+        const totalPemasukanEl = document.getElementById('total-pemasukan');
+        const totalPengeluaranEl = document.getElementById('total-pengeluaran');
+        const saldoAkhirEl = document.getElementById('saldo-akhir');
+        
+        // 2. Ambil Data dari Local Storage atau Inisialisasi
+        let transaksi = JSON.parse(localStorage.getItem('transaksiKeuangan')) || [];
+
+        // 3. Fungsi untuk Menghitung dan Memperbarui Saldo
+        function perbaruiSaldo() {
+            // Hitung total pemasukan dan pengeluaran
+            const totalPemasukan = transaksi
+                .filter(item => item.jenis === 'pemasukan')
+                .reduce((acc, item) => acc + item.jumlah, 0);
+
+            const totalPengeluaran = transaksi
+                .filter(item => item.jenis === 'pengeluaran')
+                .reduce((acc, item) => acc + item.jumlah, 0);
+
+            const saldoAkhir = totalPemasukan - totalPengeluaran;
+
+            // Perbarui tampilan di HTML
+            totalPemasukanEl.textContent = formatUang(totalPemasukan);
+            totalPengeluaranEl.textContent = formatUang(totalPengeluaran);
+            saldoAkhirEl.textContent = formatUang(saldoAkhir);
+        }
+
+        // 4. Fungsi untuk Menampilkan Riwayat Transaksi
+        function tampilkanRiwayat() {
+            riwayatList.innerHTML = ''; // Kosongkan daftar sebelum diisi ulang
+
+            transaksi.forEach((item, index) => {
+                const li = document.createElement('li');
+                const tanda = item.jenis === 'pemasukan' ? '+' : '-';
+                const warna = item.jenis === 'pemasukan' ? 'green' : 'red';
+
+                li.innerHTML = `
+                    ${item.deskripsi}: <span style="color: ${warna}; font-weight: bold;">${tanda} ${formatUang(item.jumlah)}</span> 
+                    <button onclick="hapusTransaksi(${index})">Hapus</button>
+                `;
+                riwayatList.appendChild(li);
+            });
+        }
+
+        // 5. Fungsi untuk Menyimpan Data ke Local Storage
+        function simpanData() {
+            localStorage.setItem('transaksiKeuangan', JSON.stringify(transaksi));
+        }
+
+        // 6. Fungsi untuk Menambahkan Transaksi Baru
+        function tambahTransaksi(e) {
+            e.preventDefault(); // Mencegah form melakukan reload halaman
+
+            const deskripsi = document.getElementById('deskripsi').value;
+            const jumlah = parseInt(document.getElementById('jumlah').value);
+            const jenis = document.getElementById('jenis').value;
+
+            // Buat objek transaksi baru
+            const transaksiBaru = {
+                deskripsi,
+                jumlah,
+                jenis
+            };
+
+            // Tambahkan ke array dan simpan
+            transaksi.push(transaksiBaru);
+            simpanData();
+            
+            // Perbarui tampilan
+            tampilkanRiwayat();
+            perbaruiSaldo();
+
+            // Reset formulir
+            transaksiForm.reset();
+        }
+        
+        // 7. Fungsi untuk Menghapus Transaksi
+        function hapusTransaksi(index) {
+            transaksi.splice(index, 1); // Hapus 1 item pada index tertentu
+            simpanData();
+            tampilkanRiwayat();
+            perbaruiSaldo();
+        }
+
+        // 8. Fungsi untuk Menghapus Semua Data (tombol)
+        function hapusSemuaData() {
+            if (confirm("Apakah Anda yakin ingin menghapus semua data transaksi?")) {
+                transaksi = [];
+                simpanData();
+                tampilkanRiwayat();
+                perbaruiSaldo();
+            }
+        }
+        
+        // 9. Fungsi Bantu untuk Format Mata Uang
+        function formatUang(angka) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(angka);
+        }
+
+        // 10. Listener dan Inisialisasi
+        transaksiForm.addEventListener('submit', tambahTransaksi);
+
+        // Panggil fungsi ini saat halaman dimuat
+        tampilkanRiwayat(); 
+        perbaruiSaldo();
+    </script>
+</body>
+</html>
