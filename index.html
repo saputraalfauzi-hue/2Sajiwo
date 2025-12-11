@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Code Storage</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-code"></i> Web Code Storage</h1>
+                    <p class="subtitle">Simpan, edit, dan kelola kode HTML, CSS, dan JavaScript Anda</p>
+                </div>
+                <div class="header-controls">
+                    <button id="expandView" class="btn btn-secondary btn-sm" title="Perluas tampilan">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <div class="stats">
+                        <span id="total-codes">0</span> Kode Tersimpan
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <main>
+            <section class="form-section">
+                <h2 class="section-title"><i class="fas fa-plus-circle"></i> Tambah / Edit Kode</h2>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="codeTitle">Judul Kode</label>
+                        <input type="text" id="codeTitle" placeholder="Masukkan judul kode Anda" class="full-width-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="code-header">
+                            <label for="htmlCode">HTML</label>
+                            <span class="char-count" id="htmlCount">0 karakter</span>
+                        </div>
+                        <textarea id="htmlCode" rows="8" placeholder="Masukkan kode HTML di sini..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="code-header">
+                            <label for="cssCode">CSS</label>
+                            <span class="char-count" id="cssCount">0 karakter</span>
+                        </div>
+                        <textarea id="cssCode" rows="8" placeholder="Masukkan kode CSS di sini..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="code-header">
+                            <label for="jsCode">JavaScript</label>
+                            <span class="char-count" id="jsCount">0 karakter</span>
+                        </div>
+                        <textarea id="jsCode" rows="8" placeholder="Masukkan kode JavaScript di sini..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="saveBtn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Kode
+                        </button>
+                        <button id="resetBtn" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Reset Form
+                        </button>
+                        <button id="runCodeBtn" class="btn btn-success">
+                            <i class="fas fa-play"></i> Jalankan Kode
+                        </button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="list-section">
+                <div class="list-header">
+                    <h2 class="section-title"><i class="fas fa-list"></i> Kode Tersimpan</h2>
+                    <div class="list-actions">
+                        <button id="selectAllBtn" class="btn btn-secondary">
+                            <i class="fas fa-check-square"></i> Pilih Semua
+                        </button>
+                        <button id="deselectAllBtn" class="btn btn-secondary">
+                            <i class="fas fa-times-circle"></i> Batal Pilih
+                        </button>
+                        <button id="deleteSelectedBtn" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Hapus Terpilih
+                        </button>
+                    </div>
+                </div>
+                <div class="code-list">
+                    <div class="code-grid" id="codeGrid">
+                        <div class="empty-state">
+                            <i class="fas fa-code"></i>
+                            <h3>Belum ada kode yang disimpan</h3>
+                            <p>Mulai dengan menambahkan kode HTML, CSS, dan JavaScript Anda</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="preview-section">
+                <div class="preview-container">
+                    <div class="preview-header">
+                        <h2 class="section-title"><i class="fas fa-eye"></i> Pratinjau Hasil</h2>
+                        <div class="preview-controls">
+                            <button id="togglePreviewBtn" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-eye-slash"></i> Sembunyikan
+                            </button>
+                            <button id="refreshPreview" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button id="expandPreviewBtn" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-expand"></i> Perluas
+                            </button>
+                        </div>
+                    </div>
+                    <div id="previewFrame" class="preview-iframe"></div>
+                </div>
+            </section>
+        </main>
+        
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h3>
+                <p>Apakah Anda yakin ingin menghapus kode ini? Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="modal-actions">
+                    <button id="cancelDelete" class="btn btn-secondary">Batal</button>
+                    <button id="confirmDelete" class="btn btn-danger">Hapus</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="previewExpandedModal" class="modal">
+            <div class="modal-content expanded-preview">
+                <div class="expanded-header">
+                    <h3 class="modal-title">Pratinjau Perluas</h3>
+                    <button id="closeExpandedPreview" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-times"></i> Tutup
+                    </button>
+                </div>
+                <div id="expandedPreviewFrame" class="expanded-preview-iframe"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Web Code Storage &copy; 2023 | Data disimpan di localStorage browser Anda</p>
+            <p><i class="fas fa-info-circle"></i> Gunakan tombol <i class="fas fa-expand"></i> untuk memperluas tampilan</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
