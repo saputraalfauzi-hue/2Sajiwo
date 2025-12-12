@@ -35,28 +35,69 @@
                     <div class="form-group">
                         <label for="codeTitle">Judul Kode</label>
                         <input type="text" id="codeTitle" placeholder="Masukkan judul kode Anda" class="full-width-input">
+                        <div class="upload-section">
+                            <p class="upload-label"><i class="fas fa-cloud-upload-alt"></i> Upload File Kode</p>
+                            <div class="upload-buttons">
+                                <div class="upload-btn-group">
+                                    <label for="htmlUpload" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-upload"></i> Upload HTML
+                                    </label>
+                                    <input type="file" id="htmlUpload" accept=".html,.htm,.txt" class="file-input">
+                                    <span id="htmlFileName" class="file-name">Belum ada file</span>
+                                </div>
+                                <div class="upload-btn-group">
+                                    <label for="cssUpload" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-upload"></i> Upload CSS
+                                    </label>
+                                    <input type="file" id="cssUpload" accept=".css,.txt" class="file-input">
+                                    <span id="cssFileName" class="file-name">Belum ada file</span>
+                                </div>
+                                <div class="upload-btn-group">
+                                    <label for="jsUpload" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-upload"></i> Upload JS
+                                    </label>
+                                    <input type="file" id="jsUpload" accept=".js,.txt" class="file-input">
+                                    <span id="jsFileName" class="file-name">Belum ada file</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <div class="code-header">
-                            <label for="htmlCode">HTML</label>
-                            <span class="char-count" id="htmlCount">0 karakter</span>
+                            <label for="htmlCode"><i class="fab fa-html5"></i> HTML</label>
+                            <div class="header-controls-right">
+                                <span class="char-count" id="htmlCount">0 karakter</span>
+                                <button id="clearHtmlBtn" class="btn-icon" title="Hapus kode HTML">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                         <textarea id="htmlCode" rows="8" placeholder="Masukkan kode HTML di sini..."></textarea>
                     </div>
                     
                     <div class="form-group">
                         <div class="code-header">
-                            <label for="cssCode">CSS</label>
-                            <span class="char-count" id="cssCount">0 karakter</span>
+                            <label for="cssCode"><i class="fab fa-css3-alt"></i> CSS</label>
+                            <div class="header-controls-right">
+                                <span class="char-count" id="cssCount">0 karakter</span>
+                                <button id="clearCssBtn" class="btn-icon" title="Hapus kode CSS">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                         <textarea id="cssCode" rows="8" placeholder="Masukkan kode CSS di sini..."></textarea>
                     </div>
                     
                     <div class="form-group">
                         <div class="code-header">
-                            <label for="jsCode">JavaScript</label>
-                            <span class="char-count" id="jsCount">0 karakter</span>
+                            <label for="jsCode"><i class="fab fa-js-square"></i> JavaScript</label>
+                            <div class="header-controls-right">
+                                <span class="char-count" id="jsCount">0 karakter</span>
+                                <button id="clearJsBtn" class="btn-icon" title="Hapus kode JavaScript">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
                         <textarea id="jsCode" rows="8" placeholder="Masukkan kode JavaScript di sini..."></textarea>
                     </div>
@@ -66,10 +107,13 @@
                             <i class="fas fa-save"></i> Simpan Kode
                         </button>
                         <button id="resetBtn" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> Reset Form
+                            <i class="fas fa-redo"></i> Reset Semua
                         </button>
                         <button id="runCodeBtn" class="btn btn-success">
                             <i class="fas fa-play"></i> Jalankan Kode
+                        </button>
+                        <button id="downloadAllBtn" class="btn btn-secondary">
+                            <i class="fas fa-download"></i> Download Semua
                         </button>
                     </div>
                 </div>
@@ -87,6 +131,9 @@
                         </button>
                         <button id="deleteSelectedBtn" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Hapus Terpilih
+                        </button>
+                        <button id="exportSelectedBtn" class="btn btn-success">
+                            <i class="fas fa-file-export"></i> Ekspor Terpilih
                         </button>
                     </div>
                 </div>
@@ -114,6 +161,9 @@
                             </button>
                             <button id="expandPreviewBtn" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-expand"></i> Perluas
+                            </button>
+                            <button id="downloadHtmlBtn" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-download"></i> Download HTML
                             </button>
                         </div>
                     </div>
@@ -147,7 +197,7 @@
         
         <footer>
             <p>Web Code Storage &copy; 2023 | Data disimpan di localStorage browser Anda</p>
-            <p><i class="fas fa-info-circle"></i> Gunakan tombol <i class="fas fa-expand"></i> untuk memperluas tampilan</p>
+            <p><i class="fas fa-info-circle"></i> Gunakan tombol <i class="fas fa-expand"></i> untuk memperluas tampilan | <i class="fas fa-upload"></i> untuk upload file</p>
         </footer>
     </div>
 

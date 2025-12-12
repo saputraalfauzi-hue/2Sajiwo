@@ -11,6 +11,7 @@ const jsCodeInput = document.getElementById('jsCode');
 const saveBtn = document.getElementById('saveBtn');
 const resetBtn = document.getElementById('resetBtn');
 const runCodeBtn = document.getElementById('runCodeBtn');
+const downloadAllBtn = document.getElementById('downloadAllBtn');
 const codeGrid = document.getElementById('codeGrid');
 const previewFrame = document.getElementById('previewFrame');
 const refreshPreviewBtn = document.getElementById('refreshPreview');
@@ -21,12 +22,24 @@ const confirmDeleteBtn = document.getElementById('confirmDelete');
 const selectAllBtn = document.getElementById('selectAllBtn');
 const deselectAllBtn = document.getElementById('deselectAllBtn');
 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+const exportSelectedBtn = document.getElementById('exportSelectedBtn');
 const expandViewBtn = document.getElementById('expandView');
 const togglePreviewBtn = document.getElementById('togglePreviewBtn');
 const expandPreviewBtn = document.getElementById('expandPreviewBtn');
+const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
 const previewExpandedModal = document.getElementById('previewExpandedModal');
 const expandedPreviewFrame = document.getElementById('expandedPreviewFrame');
 const closeExpandedPreviewBtn = document.getElementById('closeExpandedPreview');
+
+const htmlUpload = document.getElementById('htmlUpload');
+const cssUpload = document.getElementById('cssUpload');
+const jsUpload = document.getElementById('jsUpload');
+const htmlFileName = document.getElementById('htmlFileName');
+const cssFileName = document.getElementById('cssFileName');
+const jsFileName = document.getElementById('jsFileName');
+const clearHtmlBtn = document.getElementById('clearHtmlBtn');
+const clearCssBtn = document.getElementById('clearCssBtn');
+const clearJsBtn = document.getElementById('clearJsBtn');
 
 const htmlCount = document.getElementById('htmlCount');
 const cssCount = document.getElementById('cssCount');
@@ -38,6 +51,7 @@ function init() {
     attachEventListeners();
     updatePreview();
     loadExpandedViewState();
+    updateCharCounts();
 }
 
 function attachEventListeners() {
@@ -45,6 +59,8 @@ function attachEventListeners() {
     resetBtn.addEventListener('click', resetForm);
     runCodeBtn.addEventListener('click', updatePreview);
     refreshPreviewBtn.addEventListener('click', updatePreview);
+    downloadAllBtn.addEventListener('click', downloadAllCode);
+    downloadHtmlBtn.addEventListener('click', downloadHtmlFile);
     
     htmlCodeInput.addEventListener('input', () => {
         htmlCount.textContent = `${htmlCodeInput.value.length} karakter`;
@@ -57,6 +73,28 @@ function attachEventListeners() {
     jsCodeInput.addEventListener('input', () => {
         jsCount.textContent = `${jsCodeInput.value.length} karakter`;
     });
+    
+    clearHtmlBtn.addEventListener('click', () => {
+        htmlCodeInput.value = '';
+        htmlFileName.textContent = 'Belum ada file';
+        htmlCount.textContent = '0 karakter';
+    });
+    
+    clearCssBtn.addEventListener('click', () => {
+        cssCodeInput.value = '';
+        cssFileName.textContent = 'Belum ada file';
+        cssCount.textContent = '0 karakter';
+    });
+    
+    clearJsBtn.addEventListener('click', () => {
+        jsCodeInput.value = '';
+        jsFileName.textContent = 'Belum ada file';
+        jsCount.textContent = '0 karakter';
+    });
+    
+    htmlUpload.addEventListener('change', handleFileUpload);
+    cssUpload.addEventListener('change', handleFileUpload);
+    jsUpload.addEventListener('change', handleFileUpload);
     
     cancelDeleteBtn.addEventListener('click', () => {
         deleteModal.style.display = 'none';
@@ -73,6 +111,7 @@ function attachEventListeners() {
     selectAllBtn.addEventListener('click', selectAllCodes);
     deselectAllBtn.addEventListener('click', deselectAllCodes);
     deleteSelectedBtn.addEventListener('click', deleteSelectedCodes);
+    exportSelectedBtn.addEventListener('click', exportSelectedCodes);
     expandViewBtn.addEventListener('click', toggleExpandedView);
     expandPreviewBtn.addEventListener('click', expandPreview);
     closeExpandedPreviewBtn.addEventListener('click', closeExpandedPreview);
@@ -93,6 +132,32 @@ function attachEventListeners() {
             previewExpandedModal.style.display = 'none';
         }
     });
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const fileType = event.target.id.replace('Upload', '');
+    const fileNameElement = document.getElementById(`${fileType}FileName`);
+    const textareaElement = document.getElementById(`${fileType}Code`);
+    const countElement = document.getElementById(`${fileType}Count`);
+    
+    fileNameElement.textContent = file.name;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        textareaElement.value = e.target.result;
+        countElement.textContent = `${textareaElement.value.length} karakter`;
+        updatePreview();
+    };
+    reader.readAsText(file);
+}
+
+function updateCharCounts() {
+    htmlCount.textContent = `${htmlCodeInput.value.length} karakter`;
+    cssCount.textContent = `${cssCodeInput.value.length} karakter`;
+    jsCount.textContent = `${jsCodeInput.value.length} karakter`;
 }
 
 function saveCode() {
@@ -163,9 +228,11 @@ function editCode(id) {
     cssCodeInput.value = code.css;
     jsCodeInput.value = code.js;
     
-    htmlCount.textContent = `${code.html.length} karakter`;
-    cssCount.textContent = `${code.css.length} karakter`;
-    jsCount.textContent = `${code.js.length} karakter`;
+    htmlFileName.textContent = code.html ? 'Kode dari penyimpanan' : 'Belum ada file';
+    cssFileName.textContent = code.css ? 'Kode dari penyimpanan' : 'Belum ada file';
+    jsFileName.textContent = code.js ? 'Kode dari penyimpanan' : 'Belum ada file';
+    
+    updateCharCounts();
     
     saveBtn.innerHTML = '<i class="fas fa-edit"></i> Perbarui Kode';
     
@@ -180,9 +247,15 @@ function resetForm() {
     cssCodeInput.value = '';
     jsCodeInput.value = '';
     
-    htmlCount.textContent = '0 karakter';
-    cssCount.textContent = '0 karakter';
-    jsCount.textContent = '0 karakter';
+    htmlFileName.textContent = 'Belum ada file';
+    cssFileName.textContent = 'Belum ada file';
+    jsFileName.textContent = 'Belum ada file';
+    
+    htmlUpload.value = '';
+    cssUpload.value = '';
+    jsUpload.value = '';
+    
+    updateCharCounts();
     
     currentEditId = null;
     saveBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Kode';
@@ -258,6 +331,7 @@ function updateCodeList() {
     
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             const id = e.currentTarget.getAttribute('data-id');
             editCode(id);
         });
@@ -265,6 +339,7 @@ function updateCodeList() {
     
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
+            e.stopPropagation();
             deleteId = e.currentTarget.getAttribute('data-id');
             deleteModal.style.display = 'flex';
         });
@@ -331,6 +406,33 @@ function deleteSelectedCodes() {
     }
     
     showNotification(`${selectedCodes.size} kode berhasil dihapus!`);
+}
+
+function exportSelectedCodes() {
+    if (selectedCodes.size === 0) {
+        alert('Tidak ada kode yang dipilih untuk diekspor');
+        return;
+    }
+    
+    const selectedData = codes.filter(code => selectedCodes.has(code.id));
+    const exportData = {
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        count: selectedData.length,
+        codes: selectedData
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `web-codes-export-${new Date().toISOString().slice(0,10)}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showNotification(`${selectedData.length} kode berhasil diekspor!`);
 }
 
 function updatePreview() {
@@ -435,6 +537,108 @@ function createPreviewHTML(html, css, js) {
     `;
 }
 
+function downloadAllCode() {
+    const html = htmlCodeInput.value.trim();
+    const css = cssCodeInput.value.trim();
+    const js = jsCodeInput.value.trim();
+    
+    if (!html && !css && !js) {
+        alert('Tidak ada kode untuk didownload');
+        return;
+    }
+    
+    const fullHTML = `
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Kode dari Web Storage</title>
+            <style>
+                ${css}
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                body {
+                    padding: 20px;
+                    background-color: #f5f7fb;
+                }
+                .info-box {
+                    background-color: #e9ecef;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    font-size: 0.9rem;
+                }
+                .code-section {
+                    background-color: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                h1, h2, h3 {
+                    color: #333;
+                    margin-bottom: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="info-box">
+                <h2>Kode dari Web Storage</h2>
+                <p>Dibuat pada: ${new Date().toLocaleString()}</p>
+                <p>HTML: ${html.length} karakter | CSS: ${css.length} karakter | JavaScript: ${js.length} karakter</p>
+            </div>
+            ${html}
+            <script>
+                ${js}
+            <\/script>
+        </body>
+        </html>
+    `;
+    
+    const blob = new Blob([fullHTML], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `web-code-${new Date().toISOString().slice(0,10)}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Semua kode berhasil didownload!');
+}
+
+function downloadHtmlFile() {
+    const html = htmlCodeInput.value.trim();
+    const css = cssCodeInput.value.trim();
+    const js = jsCodeInput.value.trim();
+    
+    if (!html && !css && !js) {
+        alert('Tidak ada kode untuk didownload');
+        return;
+    }
+    
+    const fullHTML = createPreviewHTML(html, css, js);
+    const blob = new Blob([fullHTML], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `preview-${new Date().toISOString().slice(0,10)}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification('File HTML berhasil didownload!');
+}
+
 function toggleExpandedView() {
     isExpandedView = !isExpandedView;
     
@@ -481,7 +685,6 @@ function closeExpandedPreview() {
 }
 
 function togglePreview() {
-    const previewContainer = document.querySelector('.preview-container');
     const previewIframe = document.getElementById('previewFrame');
     
     if (previewIframe.style.display === 'none') {
