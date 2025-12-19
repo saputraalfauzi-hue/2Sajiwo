@@ -504,30 +504,9 @@ function createPreviewHTML(html, css, js) {
                     margin: 0;
                     background-color: #f5f7fb;
                 }
-                .preview-header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    padding-bottom: 15px;
-                    border-bottom: 1px solid #ddd;
-                    color: #333;
-                }
-                .code-info {
-                    background-color: #e9ecef;
-                    padding: 10px;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                    font-size: 0.9rem;
-                }
             </style>
         </head>
         <body>
-            <div class="preview-header">
-                <h3>Pratinjau Kode</h3>
-                <p>Ini adalah hasil dari kode yang Anda masukkan</p>
-                <div class="code-info">
-                    ${html ? 'HTML tersedia' : ''} ${css ? '| CSS tersedia' : ''} ${js ? '| JavaScript tersedia' : ''}
-                </div>
-            </div>
             ${html}
             <script>
                 ${js}
@@ -566,32 +545,9 @@ function downloadAllCode() {
                     padding: 20px;
                     background-color: #f5f7fb;
                 }
-                .info-box {
-                    background-color: #e9ecef;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                    font-size: 0.9rem;
-                }
-                .code-section {
-                    background-color: white;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin-bottom: 15px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                }
-                h1, h2, h3 {
-                    color: #333;
-                    margin-bottom: 10px;
-                }
             </style>
         </head>
         <body>
-            <div class="info-box">
-                <h2>Kode dari Web Storage</h2>
-                <p>Dibuat pada: ${new Date().toLocaleString()}</p>
-                <p>HTML: ${html.length} karakter | CSS: ${css.length} karakter | JavaScript: ${js.length} karakter</p>
-            </div>
             ${html}
             <script>
                 ${js}
