@@ -195,7 +195,10 @@ function handleFileUpload(event) {
     reader.readAsText(file);
 }
 
-function handleJsonImport(file) {
+function handleJsonImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
     importFileName.textContent = file.name;
     
     const reader = new FileReader();
