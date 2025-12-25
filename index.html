@@ -60,6 +60,13 @@
                                     <span id="jsFileName" class="file-name">Belum ada file</span>
                                 </div>
                             </div>
+                            <div class="import-section">
+                                <label for="importJson" class="btn btn-warning btn-sm" style="margin-top: 10px;">
+                                    <i class="fas fa-file-import"></i> Impor Kode dari JSON
+                                </label>
+                                <input type="file" id="importJson" accept=".json" class="file-input">
+                                <span id="importFileName" class="file-name">Belum ada file</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -135,6 +142,9 @@
                         <button id="exportSelectedBtn" class="btn btn-success">
                             <i class="fas fa-file-export"></i> Ekspor Terpilih
                         </button>
+                        <button id="importJsonBtn" class="btn btn-warning">
+                            <i class="fas fa-file-import"></i> Impor Kode
+                        </button>
                     </div>
                 </div>
                 <div class="code-list">
@@ -183,6 +193,44 @@
             </div>
         </div>
         
+        <div id="importModal" class="modal">
+            <div class="modal-content">
+                <h3 class="modal-title"><i class="fas fa-file-import"></i> Opsi Impor Kode</h3>
+                <div class="import-options">
+                    <div class="import-option">
+                        <input type="radio" id="importAppend" name="importMode" value="append" checked>
+                        <label for="importAppend">
+                            <strong>Tambah ke kode yang ada</strong>
+                            <p>Kode yang diimpor akan ditambahkan ke kode yang sudah tersimpan</p>
+                        </label>
+                    </div>
+                    <div class="import-option">
+                        <input type="radio" id="importReplace" name="importMode" value="replace">
+                        <label for="importReplace">
+                            <strong>Ganti semua kode yang ada</strong>
+                            <p>Semua kode yang tersimpan akan diganti dengan kode yang diimpor</p>
+                        </label>
+                    </div>
+                    <div class="import-option">
+                        <input type="radio" id="importMerge" name="importMode" value="merge">
+                        <label for="importMerge">
+                            <strong>Gabungkan dan update</strong>
+                            <p>Kode yang ada akan diupdate jika ID sama, yang baru akan ditambahkan</p>
+                        </label>
+                    </div>
+                </div>
+                <div class="import-stats" id="importStats" style="display: none; margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                    <p><strong>Statistik Impor:</strong></p>
+                    <p id="importCount">0 kode ditemukan</p>
+                    <p id="importDuplicates">0 duplikat ditemukan</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="cancelImport" class="btn btn-secondary">Batal</button>
+                    <button id="confirmImport" class="btn btn-success">Impor Sekarang</button>
+                </div>
+            </div>
+        </div>
+        
         <div id="previewExpandedModal" class="modal">
             <div class="modal-content expanded-preview">
                 <div class="expanded-header">
@@ -197,7 +245,7 @@
         
         <footer>
             <p>Web Code Storage &copy; 2023 | Data disimpan di localStorage browser Anda</p>
-            <p><i class="fas fa-info-circle"></i> Gunakan tombol <i class="fas fa-expand"></i> untuk memperluas tampilan | <i class="fas fa-upload"></i> untuk upload file</p>
+            <p><i class="fas fa-info-circle"></i> Gunakan tombol <i class="fas fa-expand"></i> untuk memperluas tampilan | <i class="fas fa-upload"></i> untuk upload file | <i class="fas fa-file-import"></i> untuk impor kode</p>
         </footer>
     </div>
 

@@ -635,3 +635,55 @@ textarea::-webkit-scrollbar-thumb {
 textarea::-webkit-scrollbar-thumb:hover {
     background: #777;
 }
+
+.import-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed var(--gray);
+}
+
+.import-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.import-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.import-option:hover {
+    background-color: var(--light);
+    border-color: var(--primary);
+}
+
+.import-option input[type="radio"] {
+    margin-top: 5px;
+}
+
+.import-option label {
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.import-option label strong {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--dark);
+}
+
+.import-option label p {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 0;
+}
+

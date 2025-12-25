@@ -3,6 +3,7 @@ let currentEditId = null;
 let deleteId = null;
 let selectedCodes = new Set();
 let isExpandedView = false;
+let importData = null;
 
 const codeTitleInput = document.getElementById('codeTitle');
 const htmlCodeInput = document.getElementById('htmlCode');
@@ -17,12 +18,14 @@ const previewFrame = document.getElementById('previewFrame');
 const refreshPreviewBtn = document.getElementById('refreshPreview');
 const totalCodesElement = document.getElementById('total-codes');
 const deleteModal = document.getElementById('deleteModal');
+const importModal = document.getElementById('importModal');
 const cancelDeleteBtn = document.getElementById('cancelDelete');
 const confirmDeleteBtn = document.getElementById('confirmDelete');
 const selectAllBtn = document.getElementById('selectAllBtn');
 const deselectAllBtn = document.getElementById('deselectAllBtn');
 const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 const exportSelectedBtn = document.getElementById('exportSelectedBtn');
+const importJsonBtn = document.getElementById('importJsonBtn');
 const expandViewBtn = document.getElementById('expandView');
 const togglePreviewBtn = document.getElementById('togglePreviewBtn');
 const expandPreviewBtn = document.getElementById('expandPreviewBtn');
@@ -34,12 +37,21 @@ const closeExpandedPreviewBtn = document.getElementById('closeExpandedPreview');
 const htmlUpload = document.getElementById('htmlUpload');
 const cssUpload = document.getElementById('cssUpload');
 const jsUpload = document.getElementById('jsUpload');
+const importJson = document.getElementById('importJson');
+const importJsonBtn2 = document.getElementById('importJsonBtn');
 const htmlFileName = document.getElementById('htmlFileName');
 const cssFileName = document.getElementById('cssFileName');
 const jsFileName = document.getElementById('jsFileName');
+const importFileName = document.getElementById('importFileName');
 const clearHtmlBtn = document.getElementById('clearHtmlBtn');
 const clearCssBtn = document.getElementById('clearCssBtn');
 const clearJsBtn = document.getElementById('clearJsBtn');
+
+const cancelImportBtn = document.getElementById('cancelImport');
+const confirmImportBtn = document.getElementById('confirmImport');
+const importCountElement = document.getElementById('importCount');
+const importDuplicatesElement = document.getElementById('importDuplicates');
+const importStatsElement = document.getElementById('importStats');
 
 const htmlCount = document.getElementById('htmlCount');
 const cssCount = document.getElementById('cssCount');
@@ -95,6 +107,13 @@ function attachEventListeners() {
     htmlUpload.addEventListener('change', handleFileUpload);
     cssUpload.addEventListener('change', handleFileUpload);
     jsUpload.addEventListener('change', handleFileUpload);
+    importJson.addEventListener('change', handleImportFile);
+    importJsonBtn.addEventListener('click', () => {
+        importJson.click();
+    });
+    importJsonBtn2.addEventListener('click', () => {
+        importJson.click();
+    });
     
     cancelDeleteBtn.addEventListener('click', () => {
         deleteModal.style.display = 'none';
@@ -107,6 +126,16 @@ function attachEventListeners() {
             deleteId = null;
         }
     });
+    
+    cancelImportBtn.addEventListener('click', () => {
+        importModal.style.display = 'none';
+        importData = null;
+        importJson.value = '';
+        importFileName.textContent = 'Belum ada file';
+        importStatsElement.style.display = 'none';
+    });
+    
+    confirmImportBtn.addEventListener('click', confirmImport);
     
     selectAllBtn.addEventListener('click', selectAllCodes);
     deselectAllBtn.addEventListener('click', deselectAllCodes);
@@ -122,14 +151,30 @@ function attachEventListeners() {
         if (event.target === deleteModal) {
             deleteModal.style.display = 'none';
         }
+        if (event.target === importModal) {
+            importModal.style.display = 'none';
+            importData = null;
+            importJson.value = '';
+            importFileName.textContent = 'Belum ada file';
+            importStatsElement.style.display = 'none';
+        }
         if (event.target === previewExpandedModal) {
             previewExpandedModal.style.display = 'none';
         }
     });
     
     window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && previewExpandedModal.style.display === 'flex') {
-            previewExpandedModal.style.display = 'none';
+        if (event.key === 'Escape') {
+            if (previewExpandedModal.style.display === 'flex') {
+                previewExpandedModal.style.display = 'none';
+            }
+            if (importModal.style.display === 'flex') {
+                importModal.style.display = 'none';
+                importData = null;
+                importJson.value = '';
+                importFileName.textContent = 'Belum ada file';
+                importStatsElement.style.display = 'none';
+            }
         }
     });
 }
@@ -137,6 +182,11 @@ function attachEventListeners() {
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
+    
+    if (event.target.id === 'importJson') {
+        handleJsonImport(file);
+        return;
+    }
     
     const fileType = event.target.id.replace('Upload', '');
     const fileNameElement = document.getElementById(`${fileType}FileName`);
@@ -152,6 +202,135 @@ function handleFileUpload(event) {
         updatePreview();
     };
     reader.readAsText(file);
+}
+
+function handleJsonImport(file) {
+    importFileName.textContent = file.name;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            
+            if (!imported.codes || !Array.isArray(imported.codes)) {
+                alert('Format file JSON tidak valid. Pastikan file berisi kode yang diekspor dari aplikasi ini.');
+                importJson.value = '';
+                importFileName.textContent = 'Belum ada file';
+                return;
+            }
+            
+            importData = imported.codes;
+            
+            const duplicateCount = countDuplicates(importData);
+            const totalCount = importData.length;
+            
+            importCountElement.textContent = `${totalCount} kode ditemukan`;
+            importDuplicatesElement.textContent = `${duplicateCount} duplikat ditemukan`;
+            importStatsElement.style.display = 'block';
+            
+            importModal.style.display = 'flex';
+            
+        } catch (error) {
+            alert('Gagal membaca file JSON. Pastikan file tidak rusak dan formatnya benar.');
+            importJson.value = '';
+            importFileName.textContent = 'Belum ada file';
+        }
+    };
+    reader.readAsText(file);
+}
+
+function countDuplicates(importedCodes) {
+    const existingIds = new Set(codes.map(code => code.id));
+    let duplicates = 0;
+    
+    importedCodes.forEach(code => {
+        if (existingIds.has(code.id)) {
+            duplicates++;
+        }
+    });
+    
+    return duplicates;
+}
+
+function confirmImport() {
+    if (!importData || importData.length === 0) {
+        alert('Tidak ada data untuk diimpor');
+        return;
+    }
+    
+    const importMode = document.querySelector('input[name="importMode"]:checked').value;
+    
+    switch(importMode) {
+        case 'append':
+            appendImport(importData);
+            break;
+        case 'replace':
+            replaceImport(importData);
+            break;
+        case 'merge':
+            mergeImport(importData);
+            break;
+    }
+    
+    importModal.style.display = 'none';
+    importData = null;
+    importJson.value = '';
+    importFileName.textContent = 'Belum ada file';
+    importStatsElement.style.display = 'none';
+}
+
+function appendImport(importedCodes) {
+    importedCodes.forEach(code => {
+        code.date = new Date().toISOString();
+        codes.unshift(code);
+    });
+    
+    localStorage.setItem('webCodes', JSON.stringify(codes));
+    updateCodeList();
+    updateStats();
+    showNotification(`${importedCodes.length} kode berhasil ditambahkan!`);
+}
+
+function replaceImport(importedCodes) {
+    codes = importedCodes.map(code => ({
+        ...code,
+        date: new Date().toISOString()
+    }));
+    
+    localStorage.setItem('webCodes', JSON.stringify(codes));
+    updateCodeList();
+    updateStats();
+    showNotification(`${importedCodes.length} kode berhasil diimpor (mengganti yang lama)!`);
+}
+
+function mergeImport(importedCodes) {
+    const existingIds = new Set(codes.map(code => code.id));
+    let added = 0;
+    let updated = 0;
+    
+    importedCodes.forEach(code => {
+        const index = codes.findIndex(c => c.id === code.id);
+        
+        if (index !== -1) {
+            codes[index] = {
+                ...code,
+                created: codes[index].created || code.created,
+                date: new Date().toISOString()
+            };
+            updated++;
+        } else {
+            codes.unshift({
+                ...code,
+                date: new Date().toISOString()
+            });
+            added++;
+        }
+    });
+    
+    localStorage.setItem('webCodes', JSON.stringify(codes));
+    updateCodeList();
+    updateStats();
+    showNotification(`${added} kode baru ditambahkan, ${updated} kode diperbarui!`);
 }
 
 function updateCharCounts() {
@@ -504,9 +683,30 @@ function createPreviewHTML(html, css, js) {
                     margin: 0;
                     background-color: #f5f7fb;
                 }
+                .preview-header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                    padding-bottom: 15px;
+                    border-bottom: 1px solid #ddd;
+                    color: #333;
+                }
+                .code-info {
+                    background-color: #e9ecef;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-bottom: 20px;
+                    font-size: 0.9rem;
+                }
             </style>
         </head>
         <body>
+            <div class="preview-header">
+                <h3>Pratinjau Kode</h3>
+                <p>Ini adalah hasil dari kode yang Anda masukkan</p>
+                <div class="code-info">
+                    ${html ? 'HTML tersedia' : ''} ${css ? '| CSS tersedia' : ''} ${js ? '| JavaScript tersedia' : ''}
+                </div>
+            </div>
             ${html}
             <script>
                 ${js}
@@ -545,9 +745,32 @@ function downloadAllCode() {
                     padding: 20px;
                     background-color: #f5f7fb;
                 }
+                .info-box {
+                    background-color: #e9ecef;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 20px;
+                    font-size: 0.9rem;
+                }
+                .code-section {
+                    background-color: white;
+                    padding: 15px;
+                    border-radius: 8px;
+                    margin-bottom: 15px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                }
+                h1, h2, h3 {
+                    color: #333;
+                    margin-bottom: 10px;
+                }
             </style>
         </head>
         <body>
+            <div class="info-box">
+                <h2>Kode dari Web Storage</h2>
+                <p>Dibuat pada: ${new Date().toLocaleString()}</p>
+                <p>HTML: ${html.length} karakter | CSS: ${css.length} karakter | JavaScript: ${js.length} karakter</p>
+            </div>
             ${html}
             <script>
                 ${js}
