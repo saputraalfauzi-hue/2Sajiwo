@@ -38,7 +38,6 @@ const htmlUpload = document.getElementById('htmlUpload');
 const cssUpload = document.getElementById('cssUpload');
 const jsUpload = document.getElementById('jsUpload');
 const importJson = document.getElementById('importJson');
-const importJsonBtn2 = document.getElementById('importJsonBtn');
 const htmlFileName = document.getElementById('htmlFileName');
 const cssFileName = document.getElementById('cssFileName');
 const jsFileName = document.getElementById('jsFileName');
@@ -107,11 +106,8 @@ function attachEventListeners() {
     htmlUpload.addEventListener('change', handleFileUpload);
     cssUpload.addEventListener('change', handleFileUpload);
     jsUpload.addEventListener('change', handleFileUpload);
-    importJson.addEventListener('change', handleImportFile);
+    importJson.addEventListener('change', handleJsonImport);
     importJsonBtn.addEventListener('click', () => {
-        importJson.click();
-    });
-    importJsonBtn2.addEventListener('click', () => {
         importJson.click();
     });
     
@@ -182,11 +178,6 @@ function attachEventListeners() {
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
-    if (event.target.id === 'importJson') {
-        handleJsonImport(file);
-        return;
-    }
     
     const fileType = event.target.id.replace('Upload', '');
     const fileNameElement = document.getElementById(`${fileType}FileName`);
@@ -379,7 +370,7 @@ function saveCode() {
     resetForm();
     updatePreview();
     
-    showNotification(currentEditId ? 'Kode berhasil diperbarui!' : 'Kode berhasil disimpan!');
+    showNotification('Kode berhasil disimpan!');
 }
 
 function deleteCode(id) {
